@@ -95,7 +95,8 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
     }
     if (pid == 0) {
         if (dup2(fd, STDOUT_FILENO) == -1) {
-             return false;
+            close(fd);
+            return false;
         }
         close(fd);
         execv(command[0], command);
@@ -110,5 +111,4 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
     int rc = wait(&status);
 
     return (rc == pid) && (status == 0);
-    return false;
 }
