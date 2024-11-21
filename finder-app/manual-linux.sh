@@ -88,16 +88,17 @@ ${CROSS_COMPILE}readelf -a busybox | grep "program interpreter"
 ${CROSS_COMPILE}readelf -a busybox | grep "Shared library"
 
 # Add library dependencies to rootfs
-LIBS=${OUTDIR}/libs
 
-if [ ! -d "${LIBS}" ]; then
-    unzip "${FINDER_APP_DIR}/../libs.zip" -d ${LIBS}
+if [ ! -d "${OUTDIR}/libs" ]; then
+    rm -rf "${OUTDIR}/libs"
 fi
 
-cp "${LIBS}/ld-linux-aarch64.so.1" "${OUTDIR}/rootfs/lib"
-cp "${LIBS}/libm.so.6" "${OUTDIR}/rootfs/lib64"
-cp "${LIBS}/libresolv.so.2" "${OUTDIR}/rootfs/lib64"
-cp "${LIBS}/libc.so.6" "${OUTDIR}/rootfs/lib64"
+tar xf "${FINDER_APP_DIR}/../libs.tar" --directory ${OUTDIR}
+
+cp "${OUTDIR}/libs/ld-linux-aarch64.so.1" "${OUTDIR}/rootfs/lib"
+cp "${OUTDIR}/libs/libm.so.6" "${OUTDIR}/rootfs/lib64"
+cp "${OUTDIR}/libs/libresolv.so.2" "${OUTDIR}/rootfs/lib64"
+cp "${OUTDIR}/libs/libc.so.6" "${OUTDIR}/rootfs/lib64"
 
 # Make device nodes
 cd "${OUTDIR}/rootfs"
