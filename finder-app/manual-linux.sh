@@ -88,10 +88,22 @@ ${CROSS_COMPILE}readelf -a busybox | grep "program interpreter"
 ${CROSS_COMPILE}readelf -a busybox | grep "Shared library"
 
 # Add library dependencies to rootfs
-cp ${TOOLCHAIN_PATH}/aarch64-none-linux-gnu/libc/lib/ld-linux-aarch64.so.1 ${OUTDIR}/rootfs/lib
-cp ${TOOLCHAIN_PATH}/aarch64-none-linux-gnu/libc/lib64/libm.so.6 ${OUTDIR}/rootfs/lib64
-cp ${TOOLCHAIN_PATH}/aarch64-none-linux-gnu/libc/lib64/libresolv.so.2 ${OUTDIR}/rootfs/lib64
-cp ${TOOLCHAIN_PATH}/aarch64-none-linux-gnu/libc/lib64/libc.so.6 ${OUTDIR}/rootfs/lib64
+LIBC="${TOOLCHAIN_PATH}/aarch64-none-linux-gnu/libc"
+
+if [ ! -d "${LIBC}" ]; then
+    echo "Failed to find LIBC source folder."
+    exit 1
+fi
+
+if [ ! -r "${LIBC}/lib/ld-linux-aarch64.so.1" ]; then
+    echo "Failed to read ld-linux-aarch64.so.1."
+    exit 1
+fi
+
+cp "${LIBC}/lib/ld-linux-aarch64.so.1" "${OUTDIR}/rootfs/lib"
+cp "${LIBC}/lib64/libm.so.6" "${OUTDIR}/rootfs/lib64"
+cp "${LIBC}/lib64/libresolv.so.2" "${OUTDIR}/rootfs/lib64"
+cp "${LIBC}/lib64/libc.so.6" "${OUTDIR}/rootfs/lib64"
 
 # Make device nodes
 cd "${OUTDIR}/rootfs"
