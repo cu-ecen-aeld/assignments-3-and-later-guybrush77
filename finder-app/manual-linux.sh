@@ -12,6 +12,7 @@ BUSYBOX_VERSION=1_33_1
 FINDER_APP_DIR=$(realpath $(dirname $0))
 ARCH=arm64
 CROSS_COMPILE=aarch64-none-linux-gnu-
+SYSROOT=$(${CROSS_COMPILE}gcc --print-sysroot)
 
 if [ $# -lt 1 ]
 then
@@ -83,17 +84,10 @@ ${CROSS_COMPILE}readelf -a busybox | grep "program interpreter"
 ${CROSS_COMPILE}readelf -a busybox | grep "Shared library"
 
 # Add library dependencies to rootfs
-
-if [ ! -d "${OUTDIR}/libs" ]; then
-    rm -rf "${OUTDIR}/libs"
-fi
-
-tar xf "${FINDER_APP_DIR}/../libs.tar" --directory ${OUTDIR}
-
-cp "${OUTDIR}/libs/ld-linux-aarch64.so.1" "${OUTDIR}/rootfs/lib"
-cp "${OUTDIR}/libs/libm.so.6" "${OUTDIR}/rootfs/lib64"
-cp "${OUTDIR}/libs/libresolv.so.2" "${OUTDIR}/rootfs/lib64"
-cp "${OUTDIR}/libs/libc.so.6" "${OUTDIR}/rootfs/lib64"
+cp "${SYSROOT}/lib/ld-linux-aarch64.so.1" "${OUTDIR}/rootfs/lib"
+cp "${SYSROOT}/lib64/libm.so.6" "${OUTDIR}/rootfs/lib64"
+cp "${SYSROOT}/lib64/libresolv.so.2" "${OUTDIR}/rootfs/lib64"
+cp "${SYSROOT}/lib64/libc.so.6" "${OUTDIR}/rootfs/lib64"
 
 # Make device nodes
 cd "${OUTDIR}/rootfs"
