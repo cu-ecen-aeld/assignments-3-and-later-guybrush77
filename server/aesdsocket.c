@@ -13,6 +13,7 @@
 
 #define BUFFER_SIZE 1024*1024
 #define FILENAME "/var/tmp/aesdsocketdata"
+#define PORT "9000"
 
 int is_app_running = 1;
 
@@ -134,7 +135,7 @@ struct sockaddr get_addr(struct fd_t* fd, struct buffer_t* buffer)
 
     struct addrinfo *res;
 
-    int status = getaddrinfo(NULL, "9000", &hints, &res);
+    int status = getaddrinfo(NULL, PORT, &hints, &res);
     if (status != 0) {
         syslog(LOG_ERR, "getaddrinfo fauled. %s. %m.\n",  gai_strerror(status));
         cleanup(fd, buffer);
@@ -238,6 +239,11 @@ void receive_data(struct fd_t* fd, struct buffer_t* buffer)
     }
 }
 
+void usage(const char* program)
+{
+    printf("Usage: %s [-d]\n", program);
+}
+
 int main(int argc, char* argv[])
 {
     openlog(NULL, 0, LOG_USER);
@@ -245,14 +251,14 @@ int main(int argc, char* argv[])
     int should_daemonize = 0;
 
     if (argc == 2) {
-        if ((strlen(argv[1]) != 2) || (argv[1][0] != '-') || (argv[1][1] != 'd')) {
-            printf("Usage: %s [-d]\n", argv[0]);
+        if ((strlen(argv[1]) != 2) || strcmp(argv[1], "-d")) {
+            usage(argv[0]);
             exit(EXIT_FAILURE);
         }
         should_daemonize = 1;
     }
     else if (argc > 2) {
-        printf("Usage: %s [-d]\n", argv[0]);
+        usage(argv[0]);
         exit(EXIT_FAILURE);
     }
 
